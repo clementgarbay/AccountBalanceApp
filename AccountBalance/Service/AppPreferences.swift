@@ -28,16 +28,15 @@ class AppPreferences {
     }
     
     /**
-     Set preferences.
+     Set user informations in preferences
      
-     - Parameter username:  The string of the username of the account.
-     - Parameter email:     The string of the email for the login.
-     - Parameter password:  The string of the password for the login.
-     - Parameter provider:  The corresponding Provider.
+     - Parameters:
+        - email:     The string of the email for the login.
+        - password:  The string of the password for the login.
+        - provider:  The corresponding Provider.
      */
-    func set(username: String, email: String, password: String, provider: Provider) {
+    func setUser(email: String, password: String, provider: Provider) {
         preferences.setBool(true, forKey: "hasLoggedAccount")
-        preferences.setValue(username, forKey: "username")
         preferences.setValue(email, forKey: "email")
         preferences.setInteger(provider.rawValue, forKey: "provider")
         // TODO : encrypt it with public key
@@ -45,13 +44,28 @@ class AppPreferences {
     }
     
     /**
-     Get the username corresponding to the logged account.
+     Set last account balance known in preferences
      
-     - Returns: The string of the username.
+     - Todo: Saving history
+     
+     - Parameter accountBalance: The concerned account balance object.
      */
-    func getUsernameOfLoggedAccount() -> String? {
+    func setAccountBalance(accountBalance: AccountBalance) {
+        preferences.setValue(accountBalance.username, forKey: "username")
+        preferences.setValue(accountBalance.currentBalance, forKey: "balance")
+    }
+    
+    /**
+     Get the saved account balance.
+     
+     - Returns: An account balance object.
+     */
+    func getAccountBalance() -> AccountBalance? {
         if hasLoggedAccount() {
-            return self.preferences.valueForKey("username") as? String
+            guard let username = self.preferences.valueForKey("username") as? String else { return nil }
+            guard let balance = self.preferences.valueForKey("balance") as? String else { return nil }
+            
+            return AccountBalance(username: username, currentBalance: balance, history: [])
         }
         
         return nil
