@@ -5,4 +5,5 @@ target 'AccountBalance' do
 
   pod 'Alamofire', '~> 3.4'
   pod 'KeychainSwift', '~> 3.0'
+  pod 'SwiftSpinner', '~> 0.9.5'
 end
