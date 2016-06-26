@@ -139,9 +139,6 @@
                                     <action selector="login:" destination="CB8-Qp-Y4L" eventType="touchUpInside" id="Cxn-fc-mEh"/>
                                 </connections>
                             </button>
-                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="3YP-AK-Pip" userLabel="Loader">
-                                <rect key="frame" x="232" y="479" width="20" height="20"/>
-                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -149,13 +146,11 @@
                             <constraint firstItem="XUe-gq-3vc" firstAttribute="centerX" secondItem="8sv-dw-oMt" secondAttribute="centerX" id="14Q-gl-y4L"/>
                             <constraint firstItem="OxQ-KV-goR" firstAttribute="top" secondItem="MdX-oY-DW0" secondAttribute="bottom" constant="24" id="3B8-Np-lr2"/>
                             <constraint firstItem="AX3-7w-WfY" firstAttribute="top" secondItem="OxQ-KV-goR" secondAttribute="bottom" constant="163" id="64k-lE-Fy9"/>
-                            <constraint firstItem="OxQ-KV-goR" firstAttribute="centerY" secondItem="3YP-AK-Pip" secondAttribute="centerY" id="BNW-Pp-aW2"/>
                             <constraint firstItem="XNq-CX-4F3" firstAttribute="leading" secondItem="8sv-dw-oMt" secondAttribute="leading" id="G9f-kT-LZl"/>
                             <constraint firstItem="8sv-dw-oMt" firstAttribute="trailing" secondItem="vc2-O6-3bB" secondAttribute="trailing" id="IcW-O6-4x9"/>
                             <constraint firstItem="8sv-dw-oMt" firstAttribute="top" secondItem="XNq-CX-4F3" secondAttribute="bottom" constant="8" symbolic="YES" id="Mrg-eX-XNE"/>
                             <constraint firstItem="vc2-O6-3bB" firstAttribute="trailing" secondItem="MdX-oY-DW0" secondAttribute="trailing" id="Noy-VS-fV9"/>
                             <constraint firstItem="MdX-oY-DW0" firstAttribute="centerX" secondItem="OxQ-KV-goR" secondAttribute="centerX" id="OGE-Zt-Zoy"/>
-                            <constraint firstItem="3YP-AK-Pip" firstAttribute="leading" secondItem="OxQ-KV-goR" secondAttribute="trailing" constant="8" symbolic="YES" id="Qqk-fk-GG0"/>
                             <constraint firstItem="xcM-VE-nxh" firstAttribute="top" secondItem="8sv-dw-oMt" secondAttribute="bottom" constant="23" id="hOU-hn-wUI"/>
                             <constraint firstItem="XNq-CX-4F3" firstAttribute="leading" secondItem="vbH-NK-r3M" secondAttribute="leadingMargin" constant="4" id="kEd-YL-SrF"/>
                             <constraint firstItem="8sv-dw-oMt" firstAttribute="leading" secondItem="xcM-VE-nxh" secondAttribute="leading" id="lWR-SP-4ha"/>
@@ -170,7 +165,7 @@
                     <navigationItem key="navigationItem" id="ACD-l8-l3b"/>
                     <connections>
                         <outlet property="identifierField" destination="8sv-dw-oMt" id="ivx-Lf-EpV"/>
-                        <outlet property="loader" destination="3YP-AK-Pip" id="NNO-NO-G8g"/>
+                        <outlet property="loginButton" destination="OxQ-KV-goR" id="V8Z-6f-olP"/>
                         <outlet property="passwordField" destination="vc2-O6-3bB" id="2EZ-Zv-oCd"/>
                         <outlet property="providerPicker" destination="MdX-oY-DW0" id="SZQ-yX-0kF"/>
                     </connections>

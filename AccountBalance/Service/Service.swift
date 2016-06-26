@@ -84,8 +84,11 @@ class Service {
                     
                     // Save user informations
                     if !self.preferences.hasLoggedAccount() {
-                        self.preferences.set(accountBalance.username, email: email, password: password, provider: provider)
+                        self.preferences.setUser(email, password: password, provider: provider)
                     }
+                    
+                    // Save last account balance received
+                    self.preferences.setAccountBalance(accountBalance)
                     
                     succeed!(accountBalance)
                 case .Failure(let error):

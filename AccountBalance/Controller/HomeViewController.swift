@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftSpinner
 
 class HomeViewController: UIViewController {
 
@@ -23,26 +24,39 @@ class HomeViewController: UIViewController {
         if !preferences.hasLoggedAccount() {
             showLoginWindow()
         } else {
+            showAccountBalance()
             updateAccountBalance()
         }
     }
     
-    func showRefreshImage() {
-        refreshButton.enabled = false
-    }
-    
     func showAccountBalance(accountBalance: AccountBalance) {
-        refreshButton.enabled = true
-        
         providerImage.image = preferences.getProvider().image
         userLabel.text = accountBalance.username
         balanceLabel.text = accountBalance.currentBalance
     }
     
+    func showAccountBalance() {
+        providerImage.image = preferences.getProvider().image
+        if let accountBalance = preferences.getAccountBalance() {
+            userLabel.text = accountBalance.username
+            balanceLabel.text = accountBalance.currentBalance
+        }
+    }
+    
     // MARK: - Private functions
     
+    private func showSpinner() {
+        SwiftSpinner.show("Récupération des informations...")
+        refreshButton.enabled = false
+    }
+    
+    private func hideSpinner() {
+        SwiftSpinner.hide()
+        refreshButton.enabled = true
+    }
+    
     private func updateAccountBalance() {
-        showRefreshImage()
+        showSpinner()
         
         Service.fetchData(
             failure: { error in
@@ -50,15 +64,15 @@ class HomeViewController: UIViewController {
                 case .Unauthorized:
                     self.showLoginWindow()
                 case .Other(let error):
-                    if let message = error.userInfo["NSLocalizedDescription"] as? String {
-                        Alert.show(message, viewController: self)
-                    } else {
-                        Alert.show("Erreur lors du rafraîchissement du solde", viewController: self)
-                    }
+                    let message = error.userInfo["NSLocalizedDescription"] as? String ?? "Erreur lors du rafraîchissement du solde :("
+                    SwiftSpinner.show(message, animated: false).addTapHandler({
+                        self.hideSpinner()
+                    }, subtitle: "Tapez pour cacher")
                     print(error)
                 }
             },
             success: { accountBalance in
+                self.hideSpinner()
                 self.showAccountBalance(accountBalance)
             }
         )
@@ -79,6 +93,14 @@ class HomeViewController: UIViewController {
     @IBAction func logout(sender: UIBarButtonItem) {
         preferences.clear()
         showLoginWindow()
+    }
+    
+    // MARK: - Navigation
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if let loginViewController = segue.destinationViewController as? LoginViewController {
+            loginViewController.showAccountBalance = showAccountBalance
+        }
     }
 
 }

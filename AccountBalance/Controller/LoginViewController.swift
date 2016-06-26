@@ -7,22 +7,31 @@
 //
 
 import UIKit
+import SwiftSpinner
 
 class LoginViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
 
     @IBOutlet weak var providerPicker: UIPickerView!
     @IBOutlet weak var identifierField: UITextField!
     @IBOutlet weak var passwordField: UITextField!
-    @IBOutlet weak var loader: UIActivityIndicatorView!
+    @IBOutlet weak var loginButton: UIButton!
     
     private var selectedProvider: Provider? = Provider.allProviders[0]
-    private var accountBalance: AccountBalance? = nil
+    
+    var showAccountBalance: ((accountBalance: AccountBalance) -> ())!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.providerPicker.delegate = self
         self.providerPicker.dataSource = self
+        
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+        view.addGestureRecognizer(tap)
+    }
+ 
+    func dismissKeyboard() {
+        view.endEditing(true)
     }
 
     func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
@@ -43,6 +52,16 @@ class LoginViewController: UIViewController, UIPickerViewDelegate, UIPickerViewD
     
     // MARK: - Private functions
     
+    private func showSpinner() {
+        SwiftSpinner.show("Connexion...")
+        loginButton.enabled = false
+    }
+    
+    private func hideSpinner() {
+        SwiftSpinner.hide()
+        loginButton.enabled = true
+    }
+    
     private func resetLoginForm() {
         providerPicker.selectedRowInComponent(0)
         identifierField.text = ""
@@ -57,39 +76,32 @@ class LoginViewController: UIViewController, UIPickerViewDelegate, UIPickerViewD
         
         guard selectedProvider != nil && !identifier.isEmpty && !password.isEmpty else { return }
         
-        sender.enabled = false
-        loader.hidden = false
+        showSpinner()
         
         Service.fetchData(identifier, password: password, provider: selectedProvider!,
             failure: { error in
-                sender.enabled = true
-                self.loader.hidden = true
-                            
-                switch error {
+                let message: (error: RequestError) -> String = { error in
+                    switch error {
                     case .Unauthorized:
-                        Alert.show("Identifiant ou mot de passe incorrect", viewController: self)
+                        return "Identifiant ou mot de passe incorrect"
                     case .Other(let error):
-                        Alert.show("Une erreur est survenue", viewController: self)
                         print(error)
+                        return "Une erreur est survenue"
+                    }
                 }
+                
+                SwiftSpinner.show(message(error: error), animated: false).addTapHandler({
+                    self.hideSpinner()
+                }, subtitle: "Tapez pour cacher")
             },
             success: { accountBalance in
-                sender.enabled = true
-                self.loader.hidden = true
+                self.hideSpinner()
                 self.resetLoginForm()
                 
-                self.accountBalance = accountBalance
+                self.showAccountBalance(accountBalance: accountBalance)
                 self.dismissViewControllerAnimated(true, completion: nil)
             }
         )
-    }
-
-    // MARK: - Navigation
-
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let homeViewController = segue.destinationViewController as? HomeViewController {
-            homeViewController.showAccountBalance(accountBalance!)
-        }
     }
 
 }
