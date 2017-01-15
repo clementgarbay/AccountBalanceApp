@@ -13,10 +13,10 @@ class AppPreferences {
     
     static let sharedInstance = AppPreferences()
     
-    private let preferences = NSUserDefaults.standardUserDefaults()
-    private let keychain = KeychainSwift()
+    fileprivate let preferences = UserDefaults.standard
+    fileprivate let keychain = KeychainSwift
     
-    private init() {}
+    fileprivate init() {}
     
     /**
      Checks if an account is logged.
@@ -24,7 +24,7 @@ class AppPreferences {
      - Returns: True if an account is logged, false otherwise.
      */
     func hasLoggedAccount() -> Bool {
-        return self.preferences.boolForKey("hasLoggedAccount") && self.keychain.get("AccountBalance") != nil
+        return self.preferences.bool(forKey: "hasLoggedAccount") && self.keychain.get("AccountBalance") != nil
     }
     
     /**
@@ -35,10 +35,10 @@ class AppPreferences {
         - password:  The string of the password for the login.
         - provider:  The corresponding Provider.
      */
-    func setUser(email: String, password: String, provider: Provider) {
-        preferences.setBool(true, forKey: "hasLoggedAccount")
+    func setUser(_ email: String, password: String, provider: Provider) {
+        preferences.set(true, forKey: "hasLoggedAccount")
         preferences.setValue(email, forKey: "email")
-        preferences.setInteger(provider.rawValue, forKey: "provider")
+        preferences.set(provider.rawValue, forKey: "provider")
         // TODO : encrypt it with public key
         keychain.set(password, forKey: "AccountBalance")
     }
@@ -50,7 +50,7 @@ class AppPreferences {
      
      - Parameter accountBalance: The concerned account balance object.
      */
-    func setAccountBalance(accountBalance: AccountBalance) {
+    func setAccountBalance(_ accountBalance: AccountBalance) {
         preferences.setValue(accountBalance.username, forKey: "username")
         preferences.setValue(accountBalance.currentBalance, forKey: "balance")
     }
@@ -62,8 +62,8 @@ class AppPreferences {
      */
     func getAccountBalance() -> AccountBalance? {
         if hasLoggedAccount() {
-            guard let username = self.preferences.valueForKey("username") as? String else { return nil }
-            guard let balance = self.preferences.valueForKey("balance") as? String else { return nil }
+            guard let username = self.preferences.value(forKey: "username") as? String else { return nil }
+            guard let balance = self.preferences.value(forKey: "balance") as? String else { return nil }
             
             return AccountBalance(username: username, currentBalance: balance, history: [])
         }
@@ -78,9 +78,9 @@ class AppPreferences {
      */
     func getPreferencesForRequest() -> [String: Any]? {
         
-        guard let email = self.preferences.valueForKey("email") as? String else { return nil }
+        guard let email = self.preferences.value(forKey: "email") as? String else { return nil }
         guard let password = self.keychain.get("AccountBalance") else { return nil }
-        guard let provider = Provider.getProviderFromId(self.preferences.integerForKey("provider")) else { return nil }
+        guard let provider = Provider.getProviderFromId(self.preferences.integer(forKey: "provider")) else { return nil }
         guard hasLoggedAccount() else { return nil }
         
         var pref = [String: Any]()
@@ -95,15 +95,15 @@ class AppPreferences {
      Remove all preferences.
      */
     func clear() {
-        let appDomain = NSBundle.mainBundle().bundleIdentifier!
-        preferences.removePersistentDomainForName(appDomain)
+        let appDomain = Bundle.main.bundleIdentifier!
+        preferences.removePersistentDomain(forName: appDomain)
         keychain.clear()
     }
     
     // MARK: - Getters
     
     func getProvider() -> Provider {
-        return Provider.getProviderFromId(self.preferences.integerForKey("provider"))!
+        return Provider.getProviderFromId(self.preferences.integer(forKey: "provider"))!
     }
     
 }

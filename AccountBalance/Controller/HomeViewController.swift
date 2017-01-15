@@ -29,7 +29,7 @@ class HomeViewController: UIViewController {
         }
     }
     
-    func showAccountBalance(accountBalance: AccountBalance) {
+    func showAccountBalance(_ accountBalance: AccountBalance) {
         providerImage.image = preferences.getProvider().image
         userLabel.text = accountBalance.username
         balanceLabel.text = accountBalance.currentBalance
@@ -45,25 +45,25 @@ class HomeViewController: UIViewController {
     
     // MARK: - Private functions
     
-    private func showSpinner() {
+    fileprivate func showSpinner() {
         SwiftSpinner.show("Récupération des informations...")
-        refreshButton.enabled = false
+        refreshButton.isEnabled = false
     }
     
-    private func hideSpinner() {
+    fileprivate func hideSpinner() {
         SwiftSpinner.hide()
-        refreshButton.enabled = true
+        refreshButton.isEnabled = true
     }
     
-    private func updateAccountBalance() {
+    fileprivate func updateAccountBalance() {
         showSpinner()
         
         Service.fetchData(
             failure: { error in
                 switch error {
-                case .Unauthorized:
+                case .unauthorized:
                     self.showLoginWindow()
-                case .Other(let error):
+                case .other(let error):
                     let message = error.userInfo["NSLocalizedDescription"] as? String ?? "Erreur lors du rafraîchissement du solde :("
                     SwiftSpinner.show(message, animated: false).addTapHandler({
                         self.hideSpinner()
@@ -78,27 +78,27 @@ class HomeViewController: UIViewController {
         )
     }
     
-    private func showLoginWindow() {
-        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-            self.performSegueWithIdentifier("homeToLoginSegue", sender: self)
+    fileprivate func showLoginWindow() {
+        DispatchQueue.main.async(execute: { () -> Void in
+            self.performSegue(withIdentifier: "homeToLoginSegue", sender: self)
         })
     }
     
     // MARK: - IBAction
 
-    @IBAction func refresh(sender: UIBarButtonItem) {
+    @IBAction func refresh(_ sender: UIBarButtonItem) {
         updateAccountBalance()
     }
     
-    @IBAction func logout(sender: UIBarButtonItem) {
+    @IBAction func logout(_ sender: UIBarButtonItem) {
         preferences.clear()
         showLoginWindow()
     }
     
     // MARK: - Navigation
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let loginViewController = segue.destinationViewController as? LoginViewController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let loginViewController = segue.destination as? LoginViewController {
             loginViewController.showAccountBalance = showAccountBalance
         }
     }

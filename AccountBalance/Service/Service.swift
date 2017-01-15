@@ -10,21 +10,21 @@ import Foundation
 import Alamofire
 import KeychainSwift
 
-enum RequestError: ErrorType {
-    case Unauthorized
-    case Other(NSError)
+enum RequestError: Error {
+    case unauthorized
+    case other(NSError)
     
-    static func fromNSError(error: NSError) -> RequestError {
+    static func fromNSError(_ error: NSError) -> RequestError {
         return error.userInfo["StatusCode"]
             .map({(e: AnyObject) -> Int in e as! Int})
             .map({ e in
                 switch e {
                 case 401:
-                    return RequestError.Unauthorized
+                    return RequestError.unauthorized
                 default:
-                    return RequestError.Other(error)
+                    return RequestError.other(error)
                 }
-            }) ?? RequestError.Other(error)
+            }) ?? RequestError.other(error)
     }
 }
 
@@ -33,8 +33,8 @@ class Service {
     static let preferences = AppPreferences.sharedInstance
     
     static func fetchData(
-        failure fail: (RequestError -> ())? = nil,
-        success succeed: (AccountBalance -> ())? = nil
+        failure fail: ((RequestError) -> ())? = nil,
+        success succeed: ((AccountBalance) -> ())? = nil
     ) {
         
         if self.preferences.hasLoggedAccount() {
@@ -51,33 +51,33 @@ class Service {
                     succeed!(accountBalance)
                 }
             } else {
-                fail!(RequestError.Unauthorized)
+                fail!(RequestError.unauthorized)
             }
         } else {
-            fail!(RequestError.Unauthorized)
+            fail!(RequestError.unauthorized)
         }
     }
     
     static func fetchData(
-        email: String,
+        _ email: String,
         password: String,
         provider: Provider,
-        failure fail: (RequestError -> ())? = nil,
-        success succeed: (AccountBalance -> ())? = nil
+        failure fail: ((RequestError) -> ())? = nil,
+        success succeed: ((AccountBalance) -> ())? = nil
     ) {
         
         let parameters: [String: AnyObject] = [
-            "identifier" : email,
-            "password" : password,
-            "provider" : provider.rawValue
+            "identifier" : email as AnyObject,
+            "password" : password as AnyObject,
+            "provider" : provider.rawValue as AnyObject
         ]
         
         Alamofire
-            .request(.POST, BASE_URL, parameters: parameters, encoding: .JSON)
+            .request(.POST, BASE_URL, parameters: parameters, encoding: .json)
             .validate()
             .responseJSON { response in
                 switch response.result {
-                case .Success(let response):
+                case .success(let response):
                     
                     let json = response as! [String: AnyObject]
                     let accountBalance = AccountBalance.fromJSON(json)
@@ -91,7 +91,7 @@ class Service {
                     self.preferences.setAccountBalance(accountBalance)
                     
                     succeed!(accountBalance)
-                case .Failure(let error):
+                case .failure(let error):
                     fail!(RequestError.fromNSError(error))
                 }
         }

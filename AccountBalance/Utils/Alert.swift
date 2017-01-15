@@ -10,18 +10,18 @@ import UIKit
 
 class Alert {
     
-    static func show(title: String, viewController: UIViewController) {
-        let alert = UIAlertController(title: title, message: nil, preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
-        viewController.presentViewController(alert, animated: true, completion: nil)
+    static func show(_ title: String, viewController: UIViewController) {
+        let alert = UIAlertController(title: title, message: nil, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        viewController.present(alert, animated: true, completion: nil)
     }
 
-    static func confirm(title: String, message: String, viewController: UIViewController, ok: (Void -> ())) {
-        let confirmAlert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
-        confirmAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
+    static func confirm(_ title: String, message: String, viewController: UIViewController, ok: @escaping ((Void) -> ())) {
+        let confirmAlert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        confirmAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action: UIAlertAction!) in
             ok()
         }))
-        confirmAlert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        viewController.presentViewController(confirmAlert, animated: true, completion: nil)
+        confirmAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        viewController.present(confirmAlert, animated: true, completion: nil)
     }
 }

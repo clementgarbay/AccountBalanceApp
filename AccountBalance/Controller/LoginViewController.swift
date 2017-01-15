@@ -16,9 +16,9 @@ class LoginViewController: UIViewController, UIPickerViewDelegate, UIPickerViewD
     @IBOutlet weak var passwordField: UITextField!
     @IBOutlet weak var loginButton: UIButton!
     
-    private var selectedProvider: Provider? = Provider.allProviders[0]
+    fileprivate var selectedProvider: Provider? = Provider.allProviders[0]
     
-    var showAccountBalance: ((accountBalance: AccountBalance) -> ())!
+    var showAccountBalance: ((_ accountBalance: AccountBalance) -> ())!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,43 +34,43 @@ class LoginViewController: UIViewController, UIPickerViewDelegate, UIPickerViewD
         view.endEditing(true)
     }
 
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
     
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return Provider.allProviders.count
     }
     
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return Provider.getAllProvidersValues()[row]
     }
     
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         selectedProvider = Provider.getProviderFromName(Provider.getAllProvidersValues()[row])
     }
     
     // MARK: - Private functions
     
-    private func showSpinner() {
+    fileprivate func showSpinner() {
         SwiftSpinner.show("Connexion...")
-        loginButton.enabled = false
+        loginButton.isEnabled = false
     }
     
-    private func hideSpinner() {
+    fileprivate func hideSpinner() {
         SwiftSpinner.hide()
-        loginButton.enabled = true
+        loginButton.isEnabled = true
     }
     
-    private func resetLoginForm() {
-        providerPicker.selectedRowInComponent(0)
+    fileprivate func resetLoginForm() {
+        providerPicker.selectedRow(inComponent: 0)
         identifierField.text = ""
         passwordField.text = ""
     }
     
     // MARK: - IBAction
     
-    @IBAction func login(sender: UIButton) {
+    @IBAction func login(_ sender: UIButton) {
         let identifier = identifierField.text!
         let password = passwordField.text!
         
@@ -80,11 +80,11 @@ class LoginViewController: UIViewController, UIPickerViewDelegate, UIPickerViewD
         
         Service.fetchData(identifier, password: password, provider: selectedProvider!,
             failure: { error in
-                let message: (error: RequestError) -> String = { error in
+                let message: (_ error: RequestError) -> String = { error in
                     switch error {
-                    case .Unauthorized:
+                    case .unauthorized:
                         return "Identifiant ou mot de passe incorrect"
-                    case .Other(let error):
+                    case .other(let error):
                         print(error)
                         return "Une erreur est survenue"
                     }
@@ -99,7 +99,7 @@ class LoginViewController: UIViewController, UIPickerViewDelegate, UIPickerViewD
                 self.resetLoginForm()
                 
                 self.showAccountBalance(accountBalance: accountBalance)
-                self.dismissViewControllerAnimated(true, completion: nil)
+                self.dismiss(animated: true, completion: nil)
             }
         )
     }
